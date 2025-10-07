@@ -42,7 +42,6 @@ namespace SergePlanner2
             this.statusCBox = new System.Windows.Forms.ComboBox();
             this.searchBtn = new System.Windows.Forms.Button();
             this.searchBox = new System.Windows.Forms.TextBox();
-            this.dataGridView = new System.Windows.Forms.DataGridView();
             this.updateBtn = new System.Windows.Forms.Button();
             this.deleteBtn = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
@@ -50,9 +49,9 @@ namespace SergePlanner2
             this.label1 = new System.Windows.Forms.Label();
             this.registerBtn = new System.Windows.Forms.Button();
             this.taskNameBox = new System.Windows.Forms.TextBox();
+            this.plannTable = new System.Windows.Forms.TableLayoutPanel();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // fileSystemWatcher1
@@ -63,6 +62,7 @@ namespace SergePlanner2
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.panel1.Controls.Add(this.plannTable);
             this.panel1.Controls.Add(this.endTime);
             this.panel1.Controls.Add(this.startTime);
             this.panel1.Controls.Add(this.label5);
@@ -70,7 +70,6 @@ namespace SergePlanner2
             this.panel1.Controls.Add(this.statusCBox);
             this.panel1.Controls.Add(this.searchBtn);
             this.panel1.Controls.Add(this.searchBox);
-            this.panel1.Controls.Add(this.dataGridView);
             this.panel1.Controls.Add(this.updateBtn);
             this.panel1.Controls.Add(this.deleteBtn);
             this.panel1.Controls.Add(this.label4);
@@ -81,7 +80,7 @@ namespace SergePlanner2
             this.panel1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.panel1.Location = new System.Drawing.Point(12, 4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(961, 431);
+            this.panel1.Size = new System.Drawing.Size(1165, 493);
             this.panel1.TabIndex = 9;
             // 
             // endTime
@@ -148,15 +147,6 @@ namespace SergePlanner2
             this.searchBox.Name = "searchBox";
             this.searchBox.Size = new System.Drawing.Size(231, 31);
             this.searchBox.TabIndex = 16;
-            // 
-            // dataGridView
-            // 
-            this.dataGridView.BackgroundColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.Location = new System.Drawing.Point(430, 109);
-            this.dataGridView.Name = "dataGridView";
-            this.dataGridView.Size = new System.Drawing.Size(543, 269);
-            this.dataGridView.TabIndex = 15;
             // 
             // updateBtn
             // 
@@ -232,12 +222,23 @@ namespace SergePlanner2
             this.taskNameBox.Size = new System.Drawing.Size(371, 39);
             this.taskNameBox.TabIndex = 1;
             // 
+            // plannTable
+            // 
+            this.plannTable.ColumnCount = 1;
+            this.plannTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.plannTable.Location = new System.Drawing.Point(434, 134);
+            this.plannTable.Name = "plannTable";
+            this.plannTable.RowCount = 1;
+            this.plannTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.plannTable.Size = new System.Drawing.Size(719, 356);
+            this.plannTable.TabIndex = 21;
+            // 
             // Planning
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Yellow;
-            this.ClientSize = new System.Drawing.Size(985, 438);
+            this.ClientSize = new System.Drawing.Size(1189, 509);
             this.Controls.Add(this.panel1);
             this.Name = "Planning";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -246,7 +247,6 @@ namespace SergePlanner2
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -307,7 +307,6 @@ namespace SergePlanner2
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox taskNameBox;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.DataGridView dataGridView;
         private System.Windows.Forms.Button updateBtn;
         private System.Windows.Forms.Button deleteBtn;
         private System.Windows.Forms.ComboBox statusCBox;
@@ -315,5 +314,6 @@ namespace SergePlanner2
         private System.Windows.Forms.TextBox searchBox;
         private System.Windows.Forms.DateTimePicker endTime;
         private System.Windows.Forms.DateTimePicker startTime;
+        private TableLayoutPanel plannTable;
     }
 }

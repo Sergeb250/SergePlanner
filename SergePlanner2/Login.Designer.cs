@@ -82,9 +82,9 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(266, 96);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(105, 24);
+            this.label2.Size = new System.Drawing.Size(62, 24);
             this.label2.TabIndex = 3;
-            this.label2.Text = "Username";
+            this.label2.Text = "Email";
             // 
             // label1
             // 
@@ -104,7 +104,7 @@
             this.loginBtn.Name = "loginBtn";
             this.loginBtn.Size = new System.Drawing.Size(144, 43);
             this.loginBtn.TabIndex = 6;
-            this.loginBtn.Text = "Register";
+            this.loginBtn.Text = "Login";
             this.loginBtn.UseVisualStyleBackColor = true;
             this.loginBtn.Click += new System.EventHandler(this.loginBtn_Click_1);
             // 

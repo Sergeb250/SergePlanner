@@ -7,22 +7,39 @@ namespace SergePlanner2
 {
     public partial class Planning : Form
     {
-        private string loggedUser; // current user email
+        private string loggedUser; 
         SqlConnection conn = new SqlConnection(@"Data Source=SergeB;Initial Catalog=SergePlanner;Integrated Security=True;Encrypt=True;TrustServerCertificate=True");
+        private DataGridView dgv;
 
         public Planning(string email)
         {
             InitializeComponent();
             loggedUser = email;
+            InitializeDataGridView();
         }
 
-        // 🟢 Load all planning data on form load
+        // Initialize DataGridView inside plannTable panel
+        private void InitializeDataGridView()
+        {
+            dgv = new DataGridView();
+            dgv.Dock = DockStyle.Fill;
+            dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgv.MultiSelect = false;
+            dgv.ReadOnly = true;
+            dgv.AllowUserToAddRows = false;
+            dgv.CellClick += Dgv_CellClick;
+
+            plannTable.Controls.Add(dgv);
+        }
+
+        //  Load all planning data on form load
         private void Planning_Load(object sender, EventArgs e)
         {
             LoadPlanningData();
         }
 
-        // 🟢 Add new planning + task
+        //  Add new planning + task
         private void registerBtn_Click(object sender, EventArgs e)
         {
             try
@@ -72,7 +89,7 @@ namespace SergePlanner2
             }
         }
 
-        // 🟡 Load planning records
+        //  Load planning records
         private void LoadPlanningData()
         {
             try
@@ -92,10 +109,7 @@ namespace SergePlanner2
                 SqlDataAdapter sda = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 sda.Fill(dt);
-                dataGridView.DataSource = dt;
-
-                // auto size columns
-                dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                dgv.DataSource = dt;
             }
             catch (Exception ex)
             {
@@ -107,32 +121,48 @@ namespace SergePlanner2
             }
         }
 
-        // 🟠 When user clicks a row → display data in input boxes
-        private void dataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        //  When user clicks a row → display data in input boxes
+        private void Dgv_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0)
+            try
             {
-                DataGridViewRow row = dataGridView.Rows[e.RowIndex];
+                if (e.RowIndex >= 0)
+                {
+                    DataGridViewRow row = dgv.Rows[e.RowIndex];
 
-                // Set fields
-                searchBox.Text = row.Cells["UUID"].Value.ToString();
-                taskNameBox.Text = row.Cells["taskName"].Value.ToString();
-                statusCBox.Text = row.Cells["status"].Value.ToString();
-                startTime.Value = Convert.ToDateTime(row.Cells["startDate"].Value);
-                endTime.Value = Convert.ToDateTime(row.Cells["endDate"].Value);
+                    // Set fields - display selected row data in the input boxes
+                    searchBox.Text = row.Cells["UUID"].Value.ToString();
+                    taskNameBox.Text = row.Cells["taskName"].Value.ToString();
+                    statusCBox.Text = row.Cells["status"].Value.ToString();
+                    startTime.Value = Convert.ToDateTime(row.Cells["startDate"].Value);
+                    endTime.Value = Convert.ToDateTime(row.Cells["endDate"].Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading row data: " + ex.Message);
             }
         }
 
-        // 🟣 Update selected record
+        //  Update selected record
         private void updateBtn_Click(object sender, EventArgs e)
         {
             try
             {
-                if (string.IsNullOrEmpty(searchBox.Text))
+                if (dgv.SelectedRows.Count == 0)
                 {
-                    MessageBox.Show("Select a record to update.");
+                    MessageBox.Show("Please select a record from the table to update.");
                     return;
                 }
+
+                if (string.IsNullOrEmpty(taskNameBox.Text) || string.IsNullOrEmpty(statusCBox.Text))
+                {
+                    MessageBox.Show("Please fill all required fields.");
+                    return;
+                }
+
+                // Get UUID from selected row
+                string uuid = dgv.SelectedRows[0].Cells["UUID"].Value.ToString();
 
                 if (conn.State == ConnectionState.Closed)
                     conn.Open();
@@ -140,24 +170,32 @@ namespace SergePlanner2
                 string query = @"
                     UPDATE Task 
                     SET taskName = @taskName, status = @status
-                    WHERE taskId = (SELECT taskId FROM Planning WHERE UUID = @uuid AND email = @em);
-
+                    WHERE taskId = (SELECT taskId FROM Planning WHERE CAST(UUID AS NVARCHAR(50)) = @uuid AND email = @em);
+                    
                     UPDATE Planning 
                     SET startDate = @start, endDate = @end
-                    WHERE UUID = @uuid AND email = @em;";
+                    WHERE CAST(UUID AS NVARCHAR(50)) = @uuid AND email = @em;";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@taskName", taskNameBox.Text.Trim());
                 cmd.Parameters.AddWithValue("@status", statusCBox.Text.Trim());
                 cmd.Parameters.AddWithValue("@start", startTime.Value);
                 cmd.Parameters.AddWithValue("@end", endTime.Value);
-                cmd.Parameters.AddWithValue("@uuid", searchBox.Text.Trim());
+                cmd.Parameters.AddWithValue("@uuid", uuid);
                 cmd.Parameters.AddWithValue("@em", loggedUser);
-                cmd.ExecuteNonQuery();
 
-                MessageBox.Show("Record updated successfully!");
-                LoadPlanningData();
-                ClearFields();
+                int rowsAffected = cmd.ExecuteNonQuery();
+
+                if (rowsAffected > 0)
+                {
+                    MessageBox.Show("Record updated successfully!");
+                    LoadPlanningData();
+                    ClearFields();
+                }
+                else
+                {
+                    MessageBox.Show("No record was updated.");
+                }
             }
             catch (Exception ex)
             {
@@ -169,22 +207,23 @@ namespace SergePlanner2
             }
         }
 
-        // 🔴 Delete selected record directly from DataGridView
+        //  Delete selected record
         private void deleteBtn_Click(object sender, EventArgs e)
         {
             try
             {
-                if (dataGridView.SelectedRows.Count == 0)
+                if (dgv.SelectedRows.Count == 0)
                 {
                     MessageBox.Show("Please select a row to delete.");
                     return;
                 }
 
-                DataGridViewRow selectedRow = dataGridView.SelectedRows[0];
+                DataGridViewRow selectedRow = dgv.SelectedRows[0];
                 string uuid = selectedRow.Cells["UUID"].Value.ToString();
+                string taskName = selectedRow.Cells["taskName"].Value.ToString();
 
                 DialogResult confirm = MessageBox.Show(
-                    $"Are you sure you want to delete the selected task?\nUUID: {uuid}",
+                    $"Are you sure you want to delete this task?\n\nTask: {taskName}",
                     "Confirm Delete",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning
@@ -196,7 +235,7 @@ namespace SergePlanner2
                 if (conn.State == ConnectionState.Closed)
                     conn.Open();
 
-                string deleteQuery = "DELETE FROM Planning WHERE UUID=@uuid AND email=@em";
+                string deleteQuery = "DELETE FROM Planning WHERE CAST(UUID AS NVARCHAR(50)) = @uuid AND email = @em";
                 SqlCommand cmd = new SqlCommand(deleteQuery, conn);
                 cmd.Parameters.AddWithValue("@uuid", uuid);
                 cmd.Parameters.AddWithValue("@em", loggedUser);
@@ -205,7 +244,7 @@ namespace SergePlanner2
 
                 if (rows > 0)
                 {
-                    MessageBox.Show("Deleted successfully!");
+                    MessageBox.Show("Task deleted successfully!");
                     LoadPlanningData();
                     ClearFields();
                 }
@@ -224,7 +263,7 @@ namespace SergePlanner2
             }
         }
 
-        // 🔍 Search by name or status
+        //  Search by name or status
         private void searchBtn_Click(object sender, EventArgs e)
         {
             try
@@ -246,7 +285,7 @@ namespace SergePlanner2
                 SqlDataAdapter sda = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 sda.Fill(dt);
-                dataGridView.DataSource = dt;
+                dgv.DataSource = dt;
             }
             catch (Exception ex)
             {
@@ -258,7 +297,7 @@ namespace SergePlanner2
             }
         }
 
-        // 🧹 Clear all input boxes
+        //  Clear all input boxes
         private void ClearFields()
         {
             searchBox.Clear();
